@@ -7,6 +7,7 @@ public class GameController : MonoBehaviour
     private static GameController _instance;
 
     [SerializeField] private Transform[] _players;
+    private Rigidbody _projectile;
 
     private const int MaxTurns = 4;
     private const float LaunchHeight = 1f;
@@ -99,6 +100,17 @@ public class GameController : MonoBehaviour
     public Vector3 GetLaunchPosition()
     {
         return _players[_currentPlayerIndex].position + Vector3.up * LaunchHeight;
+    }
+
+    // El proyectil que está en el aire (null si no hay ninguno). Lo usa la cámara para seguirlo.
+    public void SetProjectile(Rigidbody projectile)
+    {
+        _projectile = projectile;
+    }
+
+    public Rigidbody GetProjectile()
+    {
+        return _projectile;
     }
 
     public bool IsAiming()
