@@ -3,15 +3,17 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 // Lee el teclado con Input Actions y lo convierte en órdenes (Command).
-// W/S o flechas arriba/abajo: ángulo. D/A o flechas derecha/izquierda: fuerza. Espacio: disparar.
+// W/S o flechas arriba/abajo: ángulo.
+// Espacio: se mantiene pulsado para cargar la fuerza y se suelta para disparar.
 public class AimInput
 {
     private const float AngleSpeed = 40f;
-    private const float ForceSpeed = 50f;
+    private const float ChargeSpeed = 40f;
 
     private readonly InputAction _angle = new InputAction("Angle", InputActionType.Value);
-    private readonly InputAction _force = new InputAction("Force", InputActionType.Value);
     private readonly InputAction _fire = new InputAction("Fire", InputActionType.Button, "<Keyboard>/space");
+
+    private bool _charging;
 
     public AimInput()
     {
@@ -19,23 +21,17 @@ public class AimInput
             .With("Negative", "<Keyboard>/s").With("Positive", "<Keyboard>/w");
         _angle.AddCompositeBinding("1DAxis")
             .With("Negative", "<Keyboard>/downArrow").With("Positive", "<Keyboard>/upArrow");
-        _force.AddCompositeBinding("1DAxis")
-            .With("Negative", "<Keyboard>/a").With("Positive", "<Keyboard>/d");
-        _force.AddCompositeBinding("1DAxis")
-            .With("Negative", "<Keyboard>/leftArrow").With("Positive", "<Keyboard>/rightArrow");
     }
 
     public void Enable()
     {
         _angle.Enable();
-        _force.Enable();
         _fire.Enable();
     }
 
     public void Disable()
     {
         _angle.Disable();
-        _force.Disable();
         _fire.Disable();
     }
 
@@ -50,17 +46,27 @@ public class AimInput
             commands.Add(new ChangeAngleCommand(aim, angleAxis * AngleSpeed * Time.deltaTime));
         }
 
-        float forceAxis = _force.ReadValue<float>();
-        if (forceAxis != 0f)
+        if (_fire.WasPressedThisFrame())
         {
-            commands.Add(new ChangeForceCommand(aim, forceAxis * ForceSpeed * Time.deltaTime));
+            _charging = true;
+            commands.Add(new ResetForceCommand(aim));
+        }
+        else if (_charging && _fire.IsPressed())
+        {
+            commands.Add(new ChangeForceCommand(aim, ChargeSpeed * Time.deltaTime));
         }
 
         return commands;
     }
 
-    public bool WasFirePressed()
+    // Es verdad en el fotograma en que se suelta Espacio tras haber cargado.
+    public bool WasFireReleased()
     {
-        return _fire.WasPressedThisFrame();
+        if (_charging && _fire.WasReleasedThisFrame())
+        {
+            _charging = false;
+            return true;
+        }
+        return false;
     }
 }

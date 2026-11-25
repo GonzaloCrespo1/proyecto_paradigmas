@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Turno del jugador: apunta con ángulo y fuerza y dispara con Espacio.
+// Turno del jugador: apunta el ángulo, mantiene Espacio para cargar la fuerza y lo suelta para disparar.
 // Lee el teclado como órdenes (Command) que cambian el apuntado del jugador actual.
 public class AimingState : IGameState
 {
@@ -22,7 +22,7 @@ public class AimingState : IGameState
             command.Execute();
         }
 
-        if (_input.WasFirePressed())
+        if (_input.WasFireReleased())
         {
             controller.ChangeState(new FlightState());
         }

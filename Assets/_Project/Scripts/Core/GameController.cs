@@ -6,7 +6,10 @@ public class GameController : MonoBehaviour
 {
     private static GameController _instance;
 
+    [SerializeField] private Transform[] _players;
+
     private const int MaxTurns = 4;
+    private const float LaunchHeight = 1f;
 
     private IGameState _currentState;
     private int _currentPlayerIndex;
@@ -90,6 +93,16 @@ public class GameController : MonoBehaviour
     public AimSettings GetCurrentAim()
     {
         return _aims[_currentPlayerIndex];
+    }
+
+    public Vector3 GetLaunchPosition()
+    {
+        return _players[_currentPlayerIndex].position + Vector3.up * LaunchHeight;
+    }
+
+    public bool IsAiming()
+    {
+        return _currentState is AimingState;
     }
 
     public int GetTurnsPlayed()

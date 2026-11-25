@@ -1,10 +1,11 @@
 using UnityEngine;
 
-// El proyectil está en el aire; la cámara lo sigue.
+// El proyectil está en el aire.
+// Al entrar se lanza el proyectil con el apuntado del jugador actual.
 // De momento, el vuelo dura un tiempo fijo.
 public class FlightState : IGameState
 {
-    private const float FlightSeconds = 2f;
+    private const float FlightSeconds = 3f;
 
     private float _startTime;
 
@@ -12,6 +13,12 @@ public class FlightState : IGameState
     {
         Debug.Log("Entramos en FlightState");
         _startTime = Time.time;
+
+        GameController controller = GameController.GetInstance();
+        AimSettings aim = controller.GetCurrentAim();
+        Vector3 velocity = ShotPhysics.GetVelocity(aim.GetAngle(), aim.GetForce(), controller.GetCurrentPlayerIndex());
+        new ProjectileFactory().Create(controller.GetLaunchPosition(), velocity);
+        aim.RememberShot();
     }
 
     public void Update()
