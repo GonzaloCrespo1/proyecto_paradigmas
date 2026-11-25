@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Dibuja las dos guías del apuntado mientras se apunta:
+// Dibuja las dos guías cortas del apuntado:
 // una estela continua con el tiro que saldría ahora y una punteada con el tiro anterior del jugador.
+// Son cortas a propósito: el resto del tiro hay que estimarlo.
 public class TrajectoryView : MonoBehaviour
 {
-    private const float LineWidth = 0.15f;
+    private const float LineWidth = 0.12f;
+    private const float GuideSeconds = 1f;
 
     private LineRenderer _current;
     private LineRenderer _previous;
@@ -13,7 +15,7 @@ public class TrajectoryView : MonoBehaviour
     private void Awake()
     {
         _current = CreateLine("Estela", new Color(1f, 0.85f, 0.2f), false);
-        _previous = CreateLine("Tiro anterior", new Color(1f, 1f, 1f, 0.8f), true);
+        _previous = CreateLine("Tiro anterior", new Color(1f, 1f, 1f, 0.85f), true);
     }
 
     private void Update()
@@ -30,11 +32,11 @@ public class TrajectoryView : MonoBehaviour
         int player = controller.GetCurrentPlayerIndex();
         Vector3 origin = controller.GetLaunchPosition();
 
-        Draw(_current, origin, ShotPhysics.GetVelocity(aim.GetAngle(), aim.GetForce(), player));
+        Draw(_current, origin, ShotPhysics.GetVelocity(aim.GetAngle(), aim.GetYaw(), aim.GetForce(), player));
 
         if (aim.HasLastShot())
         {
-            Draw(_previous, origin, ShotPhysics.GetVelocity(aim.GetLastAngle(), aim.GetLastForce(), player));
+            Draw(_previous, origin, ShotPhysics.GetVelocity(aim.GetLastAngle(), aim.GetLastYaw(), aim.GetLastForce(), player));
         }
         else
         {
@@ -44,7 +46,7 @@ public class TrajectoryView : MonoBehaviour
 
     private void Draw(LineRenderer line, Vector3 origin, Vector3 velocity)
     {
-        List<Vector3> path = ShotPhysics.GetPath(origin, velocity);
+        List<Vector3> path = ShotPhysics.GetPath(origin, velocity, GuideSeconds);
         line.positionCount = path.Count;
         line.SetPositions(path.ToArray());
         line.enabled = true;

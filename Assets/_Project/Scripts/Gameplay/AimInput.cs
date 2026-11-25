@@ -3,14 +3,16 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 // Lee el teclado con Input Actions y lo convierte en órdenes (Command).
-// W/S o flechas arriba/abajo: ángulo.
+// W/S o flechas arriba/abajo: elevación. A/D o flechas izquierda/derecha: giro horizontal.
 // Espacio: se mantiene pulsado para cargar la fuerza y se suelta para disparar.
 public class AimInput
 {
     private const float AngleSpeed = 40f;
+    private const float YawSpeed = 40f;
     private const float ChargeSpeed = 40f;
 
     private readonly InputAction _angle = new InputAction("Angle", InputActionType.Value);
+    private readonly InputAction _yaw = new InputAction("Yaw", InputActionType.Value);
     private readonly InputAction _fire = new InputAction("Fire", InputActionType.Button, "<Keyboard>/space");
 
     private bool _charging;
@@ -21,17 +23,23 @@ public class AimInput
             .With("Negative", "<Keyboard>/s").With("Positive", "<Keyboard>/w");
         _angle.AddCompositeBinding("1DAxis")
             .With("Negative", "<Keyboard>/downArrow").With("Positive", "<Keyboard>/upArrow");
+        _yaw.AddCompositeBinding("1DAxis")
+            .With("Negative", "<Keyboard>/a").With("Positive", "<Keyboard>/d");
+        _yaw.AddCompositeBinding("1DAxis")
+            .With("Negative", "<Keyboard>/leftArrow").With("Positive", "<Keyboard>/rightArrow");
     }
 
     public void Enable()
     {
         _angle.Enable();
+        _yaw.Enable();
         _fire.Enable();
     }
 
     public void Disable()
     {
         _angle.Disable();
+        _yaw.Disable();
         _fire.Disable();
     }
 
@@ -44,6 +52,12 @@ public class AimInput
         if (angleAxis != 0f)
         {
             commands.Add(new ChangeAngleCommand(aim, angleAxis * AngleSpeed * Time.deltaTime));
+        }
+
+        float yawAxis = _yaw.ReadValue<float>();
+        if (yawAxis != 0f)
+        {
+            commands.Add(new ChangeYawCommand(aim, yawAxis * YawSpeed * Time.deltaTime));
         }
 
         if (_fire.WasPressedThisFrame())

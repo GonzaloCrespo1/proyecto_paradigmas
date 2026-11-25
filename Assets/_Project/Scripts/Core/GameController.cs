@@ -77,6 +77,7 @@ public class GameController : MonoBehaviour
         {
             aim.Reset();
         }
+        GameEvents.RaiseTurnChanged();
         ChangeState(new MenuState());
     }
 

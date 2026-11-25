@@ -1,36 +1,38 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Cálculos del tiro: velocidad inicial y trayectoria ideal.
-// Es lógica pura, sin escena: el jugador 1 dispara hacia la derecha y el 2 hacia la izquierda.
+// Cálculos del tiro: dirección, velocidad inicial y trayectoria ideal.
+// Es lógica pura, sin escena. El jugador 1 mira hacia +X y el jugador 2 hacia -X;
+// el giro horizontal (yaw) se mide desde esa dirección y es positivo hacia la derecha.
 public static class ShotPhysics
 {
     private const float ForceToSpeed = 0.3f;
     private const float StepSeconds = 0.1f;
-    private const int MaxPoints = 80;
-    private const float LowestHeight = -1f;
 
-    public static Vector3 GetVelocity(float angle, float force, int playerIndex)
+    // Dirección horizontal del jugador, ya girada por el yaw.
+    public static Vector3 GetDirection(float yaw, int playerIndex)
     {
-        float direction = playerIndex == 0 ? 1f : -1f;
-        float radians = angle * Mathf.Deg2Rad;
-        float speed = force * ForceToSpeed;
-        return new Vector3(direction * Mathf.Cos(radians) * speed, Mathf.Sin(radians) * speed, 0f);
+        Vector3 forward = playerIndex == 0 ? Vector3.right : Vector3.left;
+        return Quaternion.AngleAxis(yaw, Vector3.up) * forward;
     }
 
-    // Puntos de la parábola desde el origen, hasta que cae por debajo del suelo.
-    public static List<Vector3> GetPath(Vector3 origin, Vector3 velocity)
+    public static Vector3 GetVelocity(float angle, float yaw, float force, int playerIndex)
+    {
+        float radians = angle * Mathf.Deg2Rad;
+        float speed = force * ForceToSpeed;
+        Vector3 horizontal = GetDirection(yaw, playerIndex) * Mathf.Cos(radians);
+        return (horizontal + Vector3.up * Mathf.Sin(radians)) * speed;
+    }
+
+    // Puntos de la parábola desde el origen durante los segundos indicados.
+    public static List<Vector3> GetPath(Vector3 origin, Vector3 velocity, float seconds)
     {
         List<Vector3> points = new List<Vector3>();
-        for (int i = 0; i < MaxPoints; i++)
+        int count = Mathf.CeilToInt(seconds / StepSeconds);
+        for (int i = 0; i <= count; i++)
         {
             float t = i * StepSeconds;
-            Vector3 point = origin + velocity * t + 0.5f * Physics.gravity * t * t;
-            if (point.y < LowestHeight)
-            {
-                break;
-            }
-            points.Add(point);
+            points.Add(origin + velocity * t + 0.5f * Physics.gravity * t * t);
         }
         return points;
     }
