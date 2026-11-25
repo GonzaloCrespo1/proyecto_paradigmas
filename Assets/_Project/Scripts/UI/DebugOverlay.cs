@@ -16,8 +16,10 @@ public class DebugOverlay : MonoBehaviour
         string text =
             "Estado: " + controller.GetCurrentStateName() + "\n" +
             "Jugador: " + (controller.GetCurrentPlayerIndex() + 1) + "\n" +
-            "Turnos jugados: " + controller.GetTurnsPlayed() + "\n\n" +
-            "Espacio: avanzar   R: reiniciar (al terminar)";
-        GUI.Label(new Rect(20, 20, 700, 200), text, style);
+            "Turnos jugados: " + controller.GetTurnsPlayed() + "\n" +
+            "Ángulo: " + controller.GetCurrentAim().GetAngle().ToString("0") + "°   " +
+            "Fuerza: " + controller.GetCurrentAim().GetForce().ToString("0") + "\n\n" +
+            "W/S: ángulo   A/D: fuerza   Espacio: disparar   R: reiniciar (al terminar)";
+        GUI.Label(new Rect(20, 20, 1100, 220), text, style);
     }
 }

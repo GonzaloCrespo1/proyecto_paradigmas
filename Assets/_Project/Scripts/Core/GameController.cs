@@ -11,6 +11,7 @@ public class GameController : MonoBehaviour
     private IGameState _currentState;
     private int _currentPlayerIndex;
     private int _turnsPlayed;
+    private readonly AimSettings[] _aims = { new AimSettings(), new AimSettings() };
 
     public static GameController GetInstance()
     {
@@ -69,6 +70,10 @@ public class GameController : MonoBehaviour
     {
         _currentPlayerIndex = 0;
         _turnsPlayed = 0;
+        foreach (AimSettings aim in _aims)
+        {
+            aim.Reset();
+        }
         ChangeState(new MenuState());
     }
 
@@ -80,6 +85,11 @@ public class GameController : MonoBehaviour
     public int GetCurrentPlayerIndex()
     {
         return _currentPlayerIndex;
+    }
+
+    public AimSettings GetCurrentAim()
+    {
+        return _aims[_currentPlayerIndex];
     }
 
     public int GetTurnsPlayed()

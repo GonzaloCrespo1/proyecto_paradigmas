@@ -1,24 +1,35 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-// Turno del jugador: apunta y decide ángulo y fuerza.
-// De momento, Espacio dispara.
+// Turno del jugador: apunta con ángulo y fuerza y dispara con Espacio.
+// Lee el teclado como órdenes (Command) que cambian el apuntado del jugador actual.
 public class AimingState : IGameState
 {
+    private AimInput _input;
+
     public void Enter()
     {
         Debug.Log("Entramos en AimingState");
+        _input = new AimInput();
+        _input.Enable();
     }
 
     public void Update()
     {
-        if (Keyboard.current.spaceKey.wasPressedThisFrame)
+        GameController controller = GameController.GetInstance();
+
+        foreach (ICommand command in _input.ReadCommands(controller.GetCurrentAim()))
         {
-            GameController.GetInstance().ChangeState(new FlightState());
+            command.Execute();
+        }
+
+        if (_input.WasFirePressed())
+        {
+            controller.ChangeState(new FlightState());
         }
     }
 
     public void Exit()
     {
+        _input.Disable();
     }
 }
