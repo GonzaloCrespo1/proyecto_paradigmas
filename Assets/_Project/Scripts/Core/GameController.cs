@@ -6,8 +6,11 @@ public class GameController : MonoBehaviour
 {
     private static GameController _instance;
 
+    private const int MaxTurns = 4;
+
     private IGameState _currentState;
     private int _currentPlayerIndex;
+    private int _turnsPlayed;
 
     public static GameController GetInstance()
     {
@@ -53,6 +56,34 @@ public class GameController : MonoBehaviour
     public void NextTurn()
     {
         _currentPlayerIndex = 1 - _currentPlayerIndex;
+        _turnsPlayed++;
         GameEvents.RaiseTurnChanged();
+    }
+
+    public bool IsMatchOver()
+    {
+        return _turnsPlayed >= MaxTurns;
+    }
+
+    public void RestartMatch()
+    {
+        _currentPlayerIndex = 0;
+        _turnsPlayed = 0;
+        ChangeState(new MenuState());
+    }
+
+    public string GetCurrentStateName()
+    {
+        return _currentState == null ? "-" : _currentState.GetType().Name;
+    }
+
+    public int GetCurrentPlayerIndex()
+    {
+        return _currentPlayerIndex;
+    }
+
+    public int GetTurnsPlayed()
+    {
+        return _turnsPlayed;
     }
 }
