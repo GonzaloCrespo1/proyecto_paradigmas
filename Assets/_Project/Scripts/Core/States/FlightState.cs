@@ -22,6 +22,8 @@ public class FlightState : IGameState
         GameObject projectile = new ProjectileFactory().Create(controller.GetLaunchPosition(), velocity, controller.GetCurrentPlayer());
         controller.SetProjectile(projectile.GetComponent<Rigidbody>());
         aim.RememberShot();
+        ImpactEffect.SpawnMuzzle(controller.GetLaunchPosition(), velocity.normalized);
+        GameEvents.RaiseShotFired();
     }
 
     public void Update()

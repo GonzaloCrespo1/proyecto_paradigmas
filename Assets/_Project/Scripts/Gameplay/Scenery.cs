@@ -31,7 +31,10 @@ public class Scenery : MonoBehaviour
             LowPolyMesh.CreateCone(0.7f, 1.1f, 6)
         };
 
+        CreateHorizonGround();
         CreateMounds(random);
+        CreateBushes(random);
+        CreateMotes();
         for (int i = 0; i < _pines; i++)
         {
             if (TryPickSpot(random, out Vector3 spot))
@@ -71,6 +74,70 @@ public class Scenery : MonoBehaviour
             mound.AddComponent<MeshFilter>().sharedMesh = LowPolyMesh.CreateDome(radius, height, 12, 3, 0.18f, random.Next());
             mound.AddComponent<MeshRenderer>().sharedMaterial = materials[random.Next(materials.Length)];
         }
+    }
+
+    // Suelo enorme bajo el escenario: tapa el borde plano del terreno y se funde con la niebla.
+    private void CreateHorizonGround()
+    {
+        GameObject ground = new GameObject("Horizonte");
+        ground.transform.SetParent(transform);
+        ground.transform.position = new Vector3(0f, -0.06f, 0f);
+        Mesh disc = LowPolyMesh.CreateCylinder(700f, 0.1f, 24);
+        ground.AddComponent<MeshFilter>().sharedMesh = disc;
+        ground.AddComponent<MeshRenderer>().sharedMaterial = MakeMoundMaterial(new Color(0.60f, 0.55f, 0.70f));
+    }
+
+    // Arbustos pequeños de caras planas, en dos verdes, repartidos entre los pinos.
+    private void CreateBushes(System.Random random)
+    {
+        Material[] greens =
+        {
+            MakeMoundMaterial(new Color(0.30f, 0.62f, 0.45f)),
+            MakeMoundMaterial(new Color(0.40f, 0.68f, 0.42f))
+        };
+        for (int i = 0; i < 70; i++)
+        {
+            if (!TryPickSpot(random, out Vector3 spot))
+            {
+                continue;
+            }
+            float size = 0.4f + (float)random.NextDouble() * 0.6f;
+            GameObject bush = new GameObject("Arbusto");
+            bush.transform.SetParent(transform);
+            bush.transform.position = spot + Vector3.down * 0.05f;
+            bush.AddComponent<MeshFilter>().sharedMesh = LowPolyMesh.CreateDome(size, size * 0.7f, 6, 2, 0.12f, random.Next());
+            bush.AddComponent<MeshRenderer>().sharedMaterial = greens[random.Next(greens.Length)];
+        }
+    }
+
+    // Motas de luz que flotan despacio por el atardecer.
+    private void CreateMotes()
+    {
+        GameObject motes = new GameObject("Motas de luz");
+        motes.transform.SetParent(transform);
+        motes.transform.position = new Vector3(0f, 6f, 0f);
+        ParticleSystem particles = motes.AddComponent<ParticleSystem>();
+        ParticleSystem.MainModule main = particles.main;
+        main.loop = true;
+        main.startLifetime = 9f;
+        main.startSpeed = 0.25f;
+        main.startSize = new ParticleSystem.MinMaxCurve(0.08f, 0.2f);
+        main.startColor = new ParticleSystem.MinMaxGradient(new Color(2f, 1.5f, 0.9f, 0.8f), new Color(1.8f, 0.9f, 1.6f, 0.8f));
+        main.maxParticles = 180;
+        main.prewarm = true;
+        ParticleSystem.EmissionModule emission = particles.emission;
+        emission.rateOverTime = 20f;
+        ParticleSystem.ShapeModule shape = particles.shape;
+        shape.shapeType = ParticleSystemShapeType.Box;
+        shape.scale = new Vector3(100f, 12f, 60f);
+        ParticleSystem.ColorOverLifetimeModule fade = particles.colorOverLifetime;
+        fade.enabled = true;
+        Gradient gradient = new Gradient();
+        gradient.SetKeys(
+            new[] { new GradientColorKey(Color.white, 0f), new GradientColorKey(Color.white, 1f) },
+            new[] { new GradientAlphaKey(0f, 0f), new GradientAlphaKey(1f, 0.3f), new GradientAlphaKey(0f, 1f) });
+        fade.color = gradient;
+        motes.GetComponent<ParticleSystemRenderer>().material = SoftDot.GetMaterial();
     }
 
     private static Material MakeMoundMaterial(Color color)

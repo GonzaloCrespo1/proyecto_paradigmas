@@ -29,9 +29,13 @@ public class AimCamera : MonoBehaviour
     private const float RevealFov = 52f;
     private const float ShakeSeconds = 0.4f;
     private const float ShakeStrength = 0.5f;
+    private const float KickSeconds = 0.15f;
+    private const float KickStrength = 0.12f;
 
     private Vector3 _chaseForward = Vector3.right;
     private float _shakeUntil;
+    private float _shakeDuration = ShakeSeconds;
+    private float _shakePower = ShakeStrength;
     private Camera _camera;
 
     private void Awake()
@@ -42,16 +46,31 @@ public class AimCamera : MonoBehaviour
     private void OnEnable()
     {
         GameEvents.OnProjectileLanded += StartShake;
+        GameEvents.OnShotFired += StartKick;
     }
 
     private void OnDisable()
     {
         GameEvents.OnProjectileLanded -= StartShake;
+        GameEvents.OnShotFired -= StartKick;
     }
 
     private void StartShake()
     {
-        _shakeUntil = Time.time + ShakeSeconds;
+        Shake(ShakeSeconds, ShakeStrength);
+    }
+
+    // Empujón corto de cámara al soltar el disparo.
+    private void StartKick()
+    {
+        Shake(KickSeconds, KickStrength);
+    }
+
+    private void Shake(float seconds, float power)
+    {
+        _shakeDuration = seconds;
+        _shakePower = power;
+        _shakeUntil = Time.time + seconds;
     }
 
     private void LateUpdate()
@@ -122,10 +141,10 @@ public class AimCamera : MonoBehaviour
         _camera.fieldOfView = Mathf.Lerp(_camera.fieldOfView, fov, blend);
 
         // Sacudida corta tras el impacto, que se apaga sola.
-        float remaining = (_shakeUntil - Time.time) / ShakeSeconds;
+        float remaining = (_shakeUntil - Time.time) / _shakeDuration;
         if (remaining > 0f)
         {
-            transform.position += Random.insideUnitSphere * ShakeStrength * remaining;
+            transform.position += Random.insideUnitSphere * _shakePower * remaining;
         }
     }
 }

@@ -59,8 +59,12 @@ public class TrajectoryView : MonoBehaviour
 
         LineRenderer line = child.AddComponent<LineRenderer>();
         line.widthMultiplier = LineWidth;
-        line.startColor = color;
-        line.endColor = color;
+        Gradient fade = new Gradient();
+        fade.SetKeys(
+            new[] { new GradientColorKey(color, 0f), new GradientColorKey(color, 1f) },
+            new[] { new GradientAlphaKey(color.a, 0f), new GradientAlphaKey(0f, 1f) });
+        line.colorGradient = fade;
+        line.widthCurve = new AnimationCurve(new Keyframe(0f, 1.4f), new Keyframe(1f, 0.35f));
         line.numCapVertices = 4;
 
         Material material = new Material(Shader.Find("Sprites/Default"));
