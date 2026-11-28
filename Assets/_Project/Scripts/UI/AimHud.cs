@@ -63,7 +63,7 @@ public class AimHud : MonoBehaviour
 
         _angle = new RadialGauge(group.transform, "ÁNGULO", new Vector2(-560f, 62f), 300f, font);
         _force = new RadialGauge(group.transform, "FUERZA", new Vector2(560f, 62f), 300f, font);
-        _yaw = BuildText(group.transform, "Giro", font, 22, new Vector2(0.5f, 0f), new Vector2(0f, 4f), new Vector2(800f, 32f), TextAnchor.MiddleCenter);
+        _yaw = BuildText(group.transform, "Giro", font, 22, new Vector2(0.5f, 0f), new Vector2(0f, 4f), new Vector2(1000f, 32f), TextAnchor.MiddleCenter);
         _yaw.color = new Color(1f, 1f, 1f, 0.8f);
     }
 
@@ -137,7 +137,7 @@ public class AimHud : MonoBehaviour
         float forceAmount = (aim.GetForce() - AimSettings.MinForce) / (AimSettings.MaxForce - AimSettings.MinForce);
         _force.Set(forceAmount, Mathf.RoundToInt(forceAmount * 100f) + "%", Color.Lerp(ForceLow, ForceHigh, forceAmount));
 
-        _yaw.text = "GIRO " + aim.GetYaw().ToString("+0;-0;0") + "°   ·   W/S elevación · A/D giro · ESPACIO fuerza";
+        _yaw.text = "GIRO " + aim.GetYaw().ToString("+0;-0;0") + "°   ·   W/S elevación · A/D giro · ESPACIO fuerza · ENTER dispara";
     }
 
     private static string GetBanner(GameController controller)

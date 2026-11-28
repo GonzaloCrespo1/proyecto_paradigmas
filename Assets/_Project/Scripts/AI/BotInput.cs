@@ -72,7 +72,7 @@ public class BotInput : IAimSource
         return commands;
     }
 
-    public bool WasFireReleased()
+    public bool WasFireRequested()
     {
         return _fire;
     }

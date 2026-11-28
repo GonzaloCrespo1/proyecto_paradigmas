@@ -30,7 +30,7 @@ public class AimingState : IGameState
             command.Execute();
         }
 
-        if (_input.WasFireReleased())
+        if (_input.WasFireRequested())
         {
             controller.ChangeState(new FlightState());
         }
