@@ -7,5 +7,5 @@ public interface IAimSource
     void Enable();
     void Disable();
     List<ICommand> ReadCommands(AimSettings aim);
-    bool WasFireReleased();
+    bool WasFireRequested();
 }

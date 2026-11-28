@@ -37,7 +37,7 @@ public class DebugOverlay : MonoBehaviour
             "Elevación: " + controller.GetCurrentAim().GetAngle().ToString("0") + "°   " +
             "Giro: " + controller.GetCurrentAim().GetYaw().ToString("0") + "°   " +
             "Fuerza: " + controller.GetCurrentAim().GetForce().ToString("0") + "\n\n" +
-            "W/S: elevación   A/D: giro   Mantener Espacio: fuerza\nSoltar Espacio: disparar   R: reiniciar (al terminar)";
+            "W/S: elevación   A/D: giro   Mantener Espacio: fuerza (queda fija al soltar)\nEnter: disparar   R: reiniciar (al terminar)";
         GUI.Label(new Rect(20, 20, 1100, 220), text, style);
     }
 }
