@@ -6,6 +6,7 @@ using System;
 public static class GameEvents
 {
     public static event Action OnTurnChanged;
+    public static event Action OnProjectileLanded;
     public static event Action OnImpact;
     public static event Action OnHealthChanged;
     public static event Action OnGameOver;
@@ -13,6 +14,11 @@ public static class GameEvents
     public static void RaiseTurnChanged()
     {
         OnTurnChanged?.Invoke();
+    }
+
+    public static void RaiseProjectileLanded()
+    {
+        OnProjectileLanded?.Invoke();
     }
 
     public static void RaiseImpact()

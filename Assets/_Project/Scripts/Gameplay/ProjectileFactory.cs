@@ -19,6 +19,8 @@ public class ProjectileFactory
         body.collisionDetectionMode = CollisionDetectionMode.Continuous;
         body.linearVelocity = velocity;
 
+        projectile.AddComponent<ProjectileImpact>();
+
         Object.Destroy(projectile, LifeSeconds);
         return projectile;
     }

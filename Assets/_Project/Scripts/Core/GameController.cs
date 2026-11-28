@@ -113,6 +113,17 @@ public class GameController : MonoBehaviour
         return _projectile;
     }
 
+    public bool IsImpact()
+    {
+        return _currentState is ImpactState;
+    }
+
+    // Posición del rival del jugador con turno (la usa la cámara para el plano de revelado).
+    public Vector3 GetRivalPosition()
+    {
+        return _players[1 - _currentPlayerIndex].position;
+    }
+
     public bool IsAiming()
     {
         return _currentState is AimingState;

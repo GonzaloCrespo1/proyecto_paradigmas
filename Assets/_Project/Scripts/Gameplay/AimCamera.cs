@@ -1,9 +1,10 @@
 using UnityEngine;
 
-// Cámara en tercera persona. Tiene dos modos:
+// Cámara en tercera persona. Tiene tres modos:
 // - Apuntando: detrás del jugador que dispara, mirando hacia donde apunta.
 // - En vuelo: detrás del proyectil, mirando hacia donde va, para ver dónde cae.
-// En los dos se mueve con suavidad, así al cambiar de modo o de turno barre en lugar de saltar.
+// - Impacto: sube y mira al rival, que se acaba de revelar.
+// En todos se mueve con suavidad, así al cambiar de modo o de turno barre en lugar de saltar.
 public class AimCamera : MonoBehaviour
 {
     private const float AimDistance = 7f;
@@ -19,6 +20,10 @@ public class AimCamera : MonoBehaviour
     private const float ChaseFollowSpeed = 6f;
     private const float MinChaseSpeed = 0.5f;
 
+    private const float RevealDistance = 16f;
+    private const float RevealHeight = 10f;
+    private const float RevealFollowSpeed = 2.5f;
+
     private Vector3 _chaseForward = Vector3.right;
 
     private void LateUpdate()
@@ -30,7 +35,11 @@ public class AimCamera : MonoBehaviour
         }
 
         Rigidbody projectile = controller.GetProjectile();
-        if (projectile != null)
+        if (controller.IsImpact())
+        {
+            Reveal(controller);
+        }
+        else if (projectile != null)
         {
             Chase(projectile);
         }
@@ -64,6 +73,16 @@ public class AimCamera : MonoBehaviour
         Vector3 targetPosition = position - _chaseForward * ChaseDistance + Vector3.up * ChaseHeight;
         Vector3 lookPoint = position + _chaseForward * ChaseLookAhead;
         MoveTo(targetPosition, lookPoint, ChaseFollowSpeed);
+    }
+
+    private void Reveal(GameController controller)
+    {
+        Vector3 rival = controller.GetRivalPosition();
+        Vector3 forward = ShotPhysics.GetDirection(0f, controller.GetCurrentPlayerIndex());
+
+        Vector3 targetPosition = rival - forward * RevealDistance + Vector3.up * RevealHeight;
+        Vector3 lookPoint = rival + Vector3.up * LookHeight;
+        MoveTo(targetPosition, lookPoint, RevealFollowSpeed);
     }
 
     private void MoveTo(Vector3 targetPosition, Vector3 lookPoint, float speed)

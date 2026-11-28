@@ -1,10 +1,10 @@
 using UnityEngine;
 
 // El proyectil ha impactado: se resuelve el daño.
-// De momento, tras una pausa pasa el turno o termina la partida.
+// Aquí se revela al rival. De momento, tras una pausa pasa el turno o termina la partida.
 public class ImpactState : IGameState
 {
-    private const float PauseSeconds = 1f;
+    private const float PauseSeconds = 2.5f;
 
     private float _startTime;
 
@@ -37,5 +37,6 @@ public class ImpactState : IGameState
 
     public void Exit()
     {
+        GameController.GetInstance().SetProjectile(null);
     }
 }

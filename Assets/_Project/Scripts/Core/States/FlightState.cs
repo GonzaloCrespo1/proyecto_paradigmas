@@ -2,10 +2,11 @@ using UnityEngine;
 
 // El proyectil está en el aire.
 // Al entrar se lanza el proyectil con el apuntado del jugador actual.
-// De momento, el vuelo dura un tiempo fijo.
+// El vuelo termina cuando el proyectil choca con algo (aviso OnProjectileLanded);
+// si no choca con nada, un tiempo máximo evita que la partida se quede colgada.
 public class FlightState : IGameState
 {
-    private const float FlightSeconds = 3f;
+    private const float MaxFlightSeconds = 6f;
 
     private float _startTime;
 
@@ -13,6 +14,7 @@ public class FlightState : IGameState
     {
         Debug.Log("Entramos en FlightState");
         _startTime = Time.time;
+        GameEvents.OnProjectileLanded += EndFlight;
 
         GameController controller = GameController.GetInstance();
         AimSettings aim = controller.GetCurrentAim();
@@ -24,14 +26,19 @@ public class FlightState : IGameState
 
     public void Update()
     {
-        if (Time.time - _startTime >= FlightSeconds)
+        if (Time.time - _startTime >= MaxFlightSeconds)
         {
-            GameController.GetInstance().ChangeState(new ImpactState());
+            EndFlight();
         }
+    }
+
+    private void EndFlight()
+    {
+        GameController.GetInstance().ChangeState(new ImpactState());
     }
 
     public void Exit()
     {
-        GameController.GetInstance().SetProjectile(null);
+        GameEvents.OnProjectileLanded -= EndFlight;
     }
 }
