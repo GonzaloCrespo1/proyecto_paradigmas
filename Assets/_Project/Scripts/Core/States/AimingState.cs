@@ -1,24 +1,43 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-// Turno del jugador: apunta y decide ángulo y fuerza.
-// De momento, Espacio dispara.
+// Turno de apuntar: la fuente de órdenes es el teclado del jugador o el bot, según de quién sea el turno.
+// Las dos producen órdenes (Command) que cambian el apuntado del jugador actual.
 public class AimingState : IGameState
 {
+    private IAimSource _input;
+
     public void Enter()
     {
         Debug.Log("Entramos en AimingState");
+        GameController controller = GameController.GetInstance();
+        if (controller.IsBotTurn())
+        {
+            _input = new BotInput(new RandomAimDecision());
+        }
+        else
+        {
+            _input = new AimInput();
+        }
+        _input.Enable();
     }
 
     public void Update()
     {
-        if (Keyboard.current.spaceKey.wasPressedThisFrame)
+        GameController controller = GameController.GetInstance();
+
+        foreach (ICommand command in _input.ReadCommands(controller.GetCurrentAim()))
         {
-            GameController.GetInstance().ChangeState(new FlightState());
+            command.Execute();
+        }
+
+        if (_input.WasFireReleased())
+        {
+            controller.ChangeState(new FlightState());
         }
     }
 
     public void Exit()
     {
+        _input.Disable();
     }
 }
