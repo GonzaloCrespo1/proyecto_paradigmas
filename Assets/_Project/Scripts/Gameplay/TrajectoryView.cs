@@ -21,7 +21,7 @@ public class TrajectoryView : MonoBehaviour
     private void Update()
     {
         GameController controller = GameController.GetInstance();
-        if (controller == null || !controller.IsAiming())
+        if (controller == null || !controller.IsAiming() || controller.IsBotTurn())
         {
             _current.enabled = false;
             _previous.enabled = false;

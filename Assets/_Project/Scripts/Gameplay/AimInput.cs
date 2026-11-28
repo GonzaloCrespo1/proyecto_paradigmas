@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 // Lee el teclado con Input Actions y lo convierte en órdenes (Command).
 // W/S o flechas arriba/abajo: elevación. A/D o flechas izquierda/derecha: giro horizontal.
 // Espacio: se mantiene pulsado para cargar la fuerza y se suelta para disparar.
-public class AimInput
+public class AimInput : IAimSource
 {
     private const float AngleSpeed = 40f;
     private const float YawSpeed = 40f;

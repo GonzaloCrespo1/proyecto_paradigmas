@@ -11,6 +11,7 @@ public class GameController : MonoBehaviour
 
     private const int MaxTurns = 4;
     private const float LaunchHeight = 1f;
+    private const int BotPlayerIndex = 1;
 
     private IGameState _currentState;
     private int _currentPlayerIndex;
@@ -111,6 +112,12 @@ public class GameController : MonoBehaviour
     public Rigidbody GetProjectile()
     {
         return _projectile;
+    }
+
+    // De momento el jugador 2 es siempre el bot.
+    public bool IsBotTurn()
+    {
+        return _currentPlayerIndex == BotPlayerIndex;
     }
 
     public bool IsImpact()

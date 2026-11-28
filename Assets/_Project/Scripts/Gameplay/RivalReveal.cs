@@ -4,7 +4,7 @@ using UnityEngine;
 // Al empezar el siguiente turno vuelve a esconderse. Escucha avisos (Observer), no comprueba nada cada fotograma.
 public class RivalReveal : MonoBehaviour
 {
-    [SerializeField] private Renderer[] _players;
+    [SerializeField] private Transform[] _players;
 
     private void OnEnable()
     {
@@ -33,15 +33,23 @@ public class RivalReveal : MonoBehaviour
 
         for (int i = 0; i < _players.Length; i++)
         {
-            _players[i].enabled = i == controller.GetCurrentPlayerIndex();
+            SetVisible(_players[i], i == controller.GetCurrentPlayerIndex());
         }
     }
 
     private void RevealRival()
     {
-        foreach (Renderer player in _players)
+        foreach (Transform player in _players)
         {
-            player.enabled = true;
+            SetVisible(player, true);
+        }
+    }
+
+    private static void SetVisible(Transform player, bool visible)
+    {
+        foreach (Renderer part in player.GetComponentsInChildren<Renderer>())
+        {
+            part.enabled = visible;
         }
     }
 }

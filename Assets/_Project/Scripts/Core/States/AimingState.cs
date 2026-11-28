@@ -1,15 +1,23 @@
 using UnityEngine;
 
-// Turno del jugador: apunta el ángulo, mantiene Espacio para cargar la fuerza y lo suelta para disparar.
-// Lee el teclado como órdenes (Command) que cambian el apuntado del jugador actual.
+// Turno de apuntar: la fuente de órdenes es el teclado del jugador o el bot, según de quién sea el turno.
+// Las dos producen órdenes (Command) que cambian el apuntado del jugador actual.
 public class AimingState : IGameState
 {
-    private AimInput _input;
+    private IAimSource _input;
 
     public void Enter()
     {
         Debug.Log("Entramos en AimingState");
-        _input = new AimInput();
+        GameController controller = GameController.GetInstance();
+        if (controller.IsBotTurn())
+        {
+            _input = new BotInput(new RandomAimDecision());
+        }
+        else
+        {
+            _input = new AimInput();
+        }
         _input.Enable();
     }
 
