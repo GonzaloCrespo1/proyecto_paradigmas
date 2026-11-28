@@ -31,6 +31,7 @@ public class Scenery : MonoBehaviour
             LowPolyMesh.CreateCone(0.7f, 1.1f, 6)
         };
 
+        CreateMounds(random);
         for (int i = 0; i < _pines; i++)
         {
             if (TryPickSpot(random, out Vector3 spot))
@@ -45,6 +46,39 @@ public class Scenery : MonoBehaviour
                 CreateRock(spot, 0.5f + (float)random.NextDouble() * 1.3f, random.Next());
             }
         }
+    }
+
+    // Lomas bajas y anchas que rompen la planicie del suelo; solo decoran, fuera del pasillo y de las colinas.
+    private void CreateMounds(System.Random random)
+    {
+        Material[] materials =
+        {
+            MakeMoundMaterial(new Color(0.58f, 0.52f, 0.72f)),
+            MakeMoundMaterial(new Color(0.52f, 0.58f, 0.70f)),
+            MakeMoundMaterial(new Color(0.66f, 0.54f, 0.70f))
+        };
+        for (int i = 0; i < 14; i++)
+        {
+            if (!TryPickSpot(random, out Vector3 spot))
+            {
+                continue;
+            }
+            float radius = 5f + (float)random.NextDouble() * 8f;
+            float height = 0.8f + (float)random.NextDouble() * 1.6f;
+            GameObject mound = new GameObject("Loma");
+            mound.transform.SetParent(transform);
+            mound.transform.position = spot + Vector3.down * 0.15f;
+            mound.AddComponent<MeshFilter>().sharedMesh = LowPolyMesh.CreateDome(radius, height, 12, 3, 0.18f, random.Next());
+            mound.AddComponent<MeshRenderer>().sharedMaterial = materials[random.Next(materials.Length)];
+        }
+    }
+
+    private static Material MakeMoundMaterial(Color color)
+    {
+        Material material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+        material.SetColor("_BaseColor", color);
+        material.SetFloat("_Smoothness", 0.05f);
+        return material;
     }
 
     private bool TryPickSpot(System.Random random, out Vector3 spot)

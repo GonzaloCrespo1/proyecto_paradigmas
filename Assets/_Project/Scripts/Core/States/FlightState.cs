@@ -19,7 +19,7 @@ public class FlightState : IGameState
         GameController controller = GameController.GetInstance();
         AimSettings aim = controller.GetCurrentAim();
         Vector3 velocity = ShotPhysics.GetVelocity(aim.GetAngle(), aim.GetYaw(), aim.GetForce(), controller.GetCurrentPlayerIndex());
-        GameObject projectile = new ProjectileFactory().Create(controller.GetLaunchPosition(), velocity);
+        GameObject projectile = new ProjectileFactory().Create(controller.GetLaunchPosition(), velocity, controller.GetCurrentPlayer());
         controller.SetProjectile(projectile.GetComponent<Rigidbody>());
         aim.RememberShot();
     }

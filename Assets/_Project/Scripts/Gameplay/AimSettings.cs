@@ -4,11 +4,11 @@ using UnityEngine;
 // También recuerda su último disparo. Solo guarda valores y los mantiene dentro de sus límites.
 public class AimSettings
 {
-    private const float MinAngle = 5f;
-    private const float MaxAngle = 85f;
+    public const float MinAngle = 5f;
+    public const float MaxAngle = 85f;
     private const float MaxYaw = 75f;
-    private const float MinForce = 10f;
-    private const float MaxForce = 100f;
+    public const float MinForce = 10f;
+    public const float MaxForce = 100f;
     private const float DefaultAngle = 45f;
 
     private float _angle = DefaultAngle;

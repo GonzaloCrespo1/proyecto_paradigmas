@@ -13,6 +13,7 @@ public class ProjectileImpact : MonoBehaviour
         }
 
         _landed = true;
+        ImpactEffect.Spawn(transform.position);
         Rigidbody body = GetComponent<Rigidbody>();
         body.linearVelocity = Vector3.zero;
         body.isKinematic = true;

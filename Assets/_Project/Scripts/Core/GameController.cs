@@ -10,7 +10,7 @@ public class GameController : MonoBehaviour
     private Rigidbody _projectile;
 
     private const int MaxTurns = 4;
-    private const float LaunchHeight = 1f;
+    private const float LaunchHeight = 1.3f;
     private const int BotPlayerIndex = 1;
 
     private IGameState _currentState;
@@ -98,6 +98,11 @@ public class GameController : MonoBehaviour
         return _aims[_currentPlayerIndex];
     }
 
+    public Transform GetCurrentPlayer()
+    {
+        return _players[_currentPlayerIndex];
+    }
+
     public Vector3 GetLaunchPosition()
     {
         return _players[_currentPlayerIndex].position + Vector3.up * LaunchHeight;
@@ -118,6 +123,21 @@ public class GameController : MonoBehaviour
     public bool IsBotTurn()
     {
         return _currentPlayerIndex == BotPlayerIndex;
+    }
+
+    public bool IsMenu()
+    {
+        return _currentState is MenuState;
+    }
+
+    public bool IsGameOver()
+    {
+        return _currentState is GameOverState;
+    }
+
+    public int GetMaxTurns()
+    {
+        return MaxTurns;
     }
 
     public bool IsImpact()

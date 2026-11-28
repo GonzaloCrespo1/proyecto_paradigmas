@@ -24,7 +24,35 @@ public class AimCamera : MonoBehaviour
     private const float RevealHeight = 10f;
     private const float RevealFollowSpeed = 2.5f;
 
+    private const float AimFov = 60f;
+    private const float ChaseFov = 74f;
+    private const float RevealFov = 52f;
+    private const float ShakeSeconds = 0.4f;
+    private const float ShakeStrength = 0.5f;
+
     private Vector3 _chaseForward = Vector3.right;
+    private float _shakeUntil;
+    private Camera _camera;
+
+    private void Awake()
+    {
+        _camera = GetComponent<Camera>();
+    }
+
+    private void OnEnable()
+    {
+        GameEvents.OnProjectileLanded += StartShake;
+    }
+
+    private void OnDisable()
+    {
+        GameEvents.OnProjectileLanded -= StartShake;
+    }
+
+    private void StartShake()
+    {
+        _shakeUntil = Time.time + ShakeSeconds;
+    }
 
     private void LateUpdate()
     {
@@ -57,7 +85,7 @@ public class AimCamera : MonoBehaviour
 
         Vector3 targetPosition = player - forward * AimDistance + Vector3.up * AimHeight + right * ShoulderOffset;
         Vector3 lookPoint = player + forward * LookAhead + Vector3.up * LookHeight;
-        MoveTo(targetPosition, lookPoint, AimFollowSpeed);
+        MoveTo(targetPosition, lookPoint, AimFollowSpeed, AimFov);
     }
 
     private void Chase(Rigidbody projectile)
@@ -72,7 +100,7 @@ public class AimCamera : MonoBehaviour
         Vector3 position = projectile.position;
         Vector3 targetPosition = position - _chaseForward * ChaseDistance + Vector3.up * ChaseHeight;
         Vector3 lookPoint = position + _chaseForward * ChaseLookAhead;
-        MoveTo(targetPosition, lookPoint, ChaseFollowSpeed);
+        MoveTo(targetPosition, lookPoint, ChaseFollowSpeed, ChaseFov);
     }
 
     private void Reveal(GameController controller)
@@ -82,14 +110,22 @@ public class AimCamera : MonoBehaviour
 
         Vector3 targetPosition = rival - forward * RevealDistance + Vector3.up * RevealHeight;
         Vector3 lookPoint = rival + Vector3.up * LookHeight;
-        MoveTo(targetPosition, lookPoint, RevealFollowSpeed);
+        MoveTo(targetPosition, lookPoint, RevealFollowSpeed, RevealFov);
     }
 
-    private void MoveTo(Vector3 targetPosition, Vector3 lookPoint, float speed)
+    private void MoveTo(Vector3 targetPosition, Vector3 lookPoint, float speed, float fov)
     {
         Quaternion targetRotation = Quaternion.LookRotation(lookPoint - targetPosition);
         float blend = 1f - Mathf.Exp(-speed * Time.deltaTime);
         transform.position = Vector3.Lerp(transform.position, targetPosition, blend);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, blend);
+        _camera.fieldOfView = Mathf.Lerp(_camera.fieldOfView, fov, blend);
+
+        // Sacudida corta tras el impacto, que se apaga sola.
+        float remaining = (_shakeUntil - Time.time) / ShakeSeconds;
+        if (remaining > 0f)
+        {
+            transform.position += Random.insideUnitSphere * ShakeStrength * remaining;
+        }
     }
 }
